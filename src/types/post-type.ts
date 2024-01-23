@@ -13,5 +13,5 @@ export interface CardPostI {
     total: number
     setSkip: (val: number) => void
     setLimit: (val: number) => void
-    limit: number
+    setSearch: (val: string) => void
 }

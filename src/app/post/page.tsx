@@ -4,7 +4,7 @@ import CardPost from "@/component/Card";
 import { usePostService } from "@/service/post-service";
 
 export default function Home() {
-  const { datas, isLoading, total, setSkip, setLimit, limit } =
+  const { datas, isLoading, total, setSkip, setLimit, setSearch } =
     usePostService();
   return (
     <CardPost
@@ -13,7 +13,7 @@ export default function Home() {
       total={total}
       setSkip={setSkip}
       setLimit={setLimit}
-      limit={limit}
+      setSearch={setSearch}
     />
   );
 }

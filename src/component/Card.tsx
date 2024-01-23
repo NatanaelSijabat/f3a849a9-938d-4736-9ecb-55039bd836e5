@@ -1,12 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 import { CardPostI } from "@/types/post-type";
 import { UserI } from "@/types/user-type";
 import axios from "axios";
 import UserSchema from "@/models/User";
-import { Avatar, Card, Pagination, PaginationProps, Skeleton } from "antd";
+import {
+  Avatar,
+  Card,
+  Pagination,
+  PaginationProps,
+  Skeleton,
+  Space,
+  Typography,
+} from "antd";
 import { CommentOutlined, HeartOutlined } from "@ant-design/icons";
+import Search, { SearchProps } from "antd/es/input/Search";
 
 const CardPost: React.FC<CardPostI> = ({
   data,
@@ -14,10 +22,11 @@ const CardPost: React.FC<CardPostI> = ({
   total,
   setSkip,
   setLimit,
-  limit,
+  setSearch,
 }) => {
   const [users, setUser] = useState<UserI[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const { Text } = Typography;
 
   const fetchApi = async () => {
     try {
@@ -49,12 +58,23 @@ const CardPost: React.FC<CardPostI> = ({
     setLimit && setLimit(pageSize);
   };
 
+  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
+    setSearch(value);
+  };
+
   return (
     <>
       {isLoading ? (
         <Skeleton loading={isLoading} avatar active />
       ) : (
         <>
+          <Search
+            placeholder="input search text"
+            allowClear
+            enterButton="Search"
+            size="large"
+            onSearch={onSearch}
+          />
           {data?.map((item, index) => (
             <Card
               className="m-10"
@@ -74,7 +94,12 @@ const CardPost: React.FC<CardPostI> = ({
                   />
                 }
                 title={item.title}
-                description={item.body}
+                description={
+                  <Space direction="vertical">
+                    <Text>{item.body}</Text>
+                    <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
+                  </Space>
+                }
               />
             </Card>
           ))}
