@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import { CardPostI } from "@/types/post-type";
 import {
   Avatar,
   Card,
@@ -10,21 +9,21 @@ import {
   Space,
   Typography,
 } from "antd";
-import { CommentOutlined, HeartOutlined } from "@ant-design/icons";
-import Search, { SearchProps } from "antd/es/input/Search";
 import { useUserService } from "@/service/users-service";
+import { CardCommentI } from "@/types/commeny-type";
+import { usePostService } from "@/service/post-service";
 
-const CardPost: React.FC<CardPostI> = ({
+const CardComment: React.FC<CardCommentI> = ({
   data,
   isLoading,
   total,
   setSkip,
   setLimit,
-  setSearch,
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { Text } = Typography;
+  // const { Text } = Typography;
   const { users } = useUserService();
+  // const { datas } = usePostService();
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -40,50 +39,22 @@ const CardPost: React.FC<CardPostI> = ({
     setLimit && setLimit(pageSize);
   };
 
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    setSearch(value);
-  };
-
   return (
     <>
-      {isLoading ? (
-        <Skeleton loading={isLoading} active />
-      ) : (
-        <Search
-          placeholder="input search text"
-          allowClear
-          enterButton="Search"
-          size="large"
-          onSearch={onSearch}
-        />
-      )}
       {isLoading ? (
         <Skeleton loading={isLoading} avatar active />
       ) : (
         data?.map((item, index) => (
-          <Card
-            className="m-10"
-            style={{ margin: 20 }}
-            key={index}
-            actions={[
-              <div>
-                <HeartOutlined /> <span>{item.reactions}</span>
-              </div>,
-              <CommentOutlined />,
-            ]}
-          >
+          <Card className="m-10" style={{ margin: 20 }} key={index}>
             <Card.Meta
               avatar={
                 <Avatar
-                  src={users.find((items) => items.id === item.userId)?.image}
+                  src={users.find((items) => items.id === item.user?.id)?.image}
                 />
               }
-              title={item.title}
+              title={item.body}
               description={
-                <Space direction="vertical">
-                  <Text>{item.body}</Text>
-                  <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
-                </Space>
+                <Space direction="vertical">{/* <Text>{}</Text> */}</Space>
               }
             />
           </Card>
@@ -104,4 +75,4 @@ const CardPost: React.FC<CardPostI> = ({
   );
 };
 
-export default CardPost;
+export default CardComment;
