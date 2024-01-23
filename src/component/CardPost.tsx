@@ -13,6 +13,7 @@ import {
 import { CommentOutlined, HeartOutlined } from "@ant-design/icons";
 import Search, { SearchProps } from "antd/es/input/Search";
 import { useUserService } from "@/service/users-service";
+import ListComment from "./ListComment";
 
 const CardPost: React.FC<CardPostI> = ({
   data,
@@ -25,6 +26,8 @@ const CardPost: React.FC<CardPostI> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { Text } = Typography;
   const { users } = useUserService();
+  // const [visible, setVisible] = useState<boolean>(false);
+  const [visibleCommentId, setVisibleCommentId] = useState<number | null>(null);
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -44,10 +47,18 @@ const CardPost: React.FC<CardPostI> = ({
     setSearch(value);
   };
 
-  const IconText = ({ icon, text }: { icon: React.FC; text: number }) => (
-    <Space>
+  const IconText = ({
+    icon,
+    count,
+    onClick,
+  }: {
+    icon: React.FC;
+    count: number;
+    onClick: () => void;
+  }) => (
+    <Space onClick={onClick}>
       {React.createElement(icon)}
-      {text}
+      {count}
     </Space>
   );
 
@@ -68,37 +79,41 @@ const CardPost: React.FC<CardPostI> = ({
         <Skeleton loading={isLoading} avatar active />
       ) : (
         data?.map((item, index) => (
-          <Card
-            className="m-10"
-            style={{ margin: 20 }}
-            key={index}
-            actions={[
-              // <div>
-              //   <HeartOutlined /> <span>{item.reactions}</span>
-              // </div>,
-              <IconText
-                icon={HeartOutlined}
-                text={item.reactions}
-                key="list-vertical-like-o"
-              />,
-              <CommentOutlined />,
-            ]}
-          >
-            <Card.Meta
-              avatar={
-                <Avatar
-                  src={users.find((items) => items.id === item.userId)?.image}
-                />
-              }
-              title={item.title}
-              description={
-                <Space direction="vertical">
-                  <Text>{item.body}</Text>
-                  <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
-                </Space>
-              }
-            />
-          </Card>
+          <>
+            <Card
+              className="m-10"
+              style={{ margin: 20 }}
+              key={index}
+              actions={[
+                <IconText
+                  icon={HeartOutlined}
+                  count={item.reactions}
+                  onClick={() => console.log("like")}
+                />,
+                <IconText
+                  icon={CommentOutlined}
+                  count={10}
+                  onClick={() => setVisibleCommentId(item.id)}
+                />,
+              ]}
+            >
+              <Card.Meta
+                avatar={
+                  <Avatar
+                    src={users.find((items) => items.id === item.userId)?.image}
+                  />
+                }
+                title={item.title}
+                description={
+                  <Space direction="vertical">
+                    <Text>{item.body}</Text>
+                    <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
+                  </Space>
+                }
+              />
+            </Card>
+            {visibleCommentId === item.id && <ListComment key={index} />}
+          </>
         ))
       )}
       {!isLoading && (
