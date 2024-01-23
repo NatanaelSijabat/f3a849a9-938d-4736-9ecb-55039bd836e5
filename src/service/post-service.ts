@@ -57,8 +57,6 @@ const usePostService = () => {
             }
         };
 
-        console.log(search, 'cari')
-
         fetchApi()
     }, [skip, limit, search])
 

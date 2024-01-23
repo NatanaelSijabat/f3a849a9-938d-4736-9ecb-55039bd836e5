@@ -1,9 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CardPostI } from "@/types/post-type";
-import { UserI } from "@/types/user-type";
-import axios from "axios";
-import UserSchema from "@/models/User";
 import {
   Avatar,
   Card,
@@ -15,6 +12,7 @@ import {
 } from "antd";
 import { CommentOutlined, HeartOutlined } from "@ant-design/icons";
 import Search, { SearchProps } from "antd/es/input/Search";
+import { useUserService } from "@/service/users-service";
 
 const CardPost: React.FC<CardPostI> = ({
   data,
@@ -24,25 +22,9 @@ const CardPost: React.FC<CardPostI> = ({
   setLimit,
   setSearch,
 }) => {
-  const [users, setUser] = useState<UserI[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { Text } = Typography;
-
-  const fetchApi = async () => {
-    try {
-      const res = await axios.get("https://dummyjson.com/users?limit=100");
-      if (res.status === 200) {
-        const user = UserSchema.parse(res.data.users);
-        setUser(user);
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchApi();
-  }, []);
+  const { users } = useUserService();
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -65,54 +47,58 @@ const CardPost: React.FC<CardPostI> = ({
   return (
     <>
       {isLoading ? (
+        <Skeleton loading={isLoading} active />
+      ) : (
+        <Search
+          placeholder="input search text"
+          allowClear
+          enterButton="Search"
+          size="large"
+          onSearch={onSearch}
+        />
+      )}
+      {isLoading ? (
         <Skeleton loading={isLoading} avatar active />
       ) : (
-        <>
-          <Search
-            placeholder="input search text"
-            allowClear
-            enterButton="Search"
-            size="large"
-            onSearch={onSearch}
-          />
-          {data?.map((item, index) => (
-            <Card
-              className="m-10"
-              style={{ margin: 20 }}
-              key={index}
-              actions={[
-                <div>
-                  <HeartOutlined /> <span>{item.reactions}</span>
-                </div>,
-                <CommentOutlined />,
-              ]}
-            >
-              <Card.Meta
-                avatar={
-                  <Avatar
-                    src={users.find((items) => items.id === item.userId)?.image}
-                  />
-                }
-                title={item.title}
-                description={
-                  <Space direction="vertical">
-                    <Text>{item.body}</Text>
-                    <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
-                  </Space>
-                }
-              />
-            </Card>
-          ))}
-          <div style={{ display: "flex", justifyContent: "end" }}>
-            <Pagination
-              total={total}
-              showSizeChanger
-              onChange={onPageChange}
-              current={currentPage}
-              onShowSizeChange={onShowSizeChange}
+        data?.map((item, index) => (
+          <Card
+            className="m-10"
+            style={{ margin: 20 }}
+            key={index}
+            actions={[
+              <div>
+                <HeartOutlined /> <span>{item.reactions}</span>
+              </div>,
+              <CommentOutlined />,
+            ]}
+          >
+            <Card.Meta
+              avatar={
+                <Avatar
+                  src={users.find((items) => items.id === item.userId)?.image}
+                />
+              }
+              title={item.title}
+              description={
+                <Space direction="vertical">
+                  <Text>{item.body}</Text>
+                  <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
+                </Space>
+              }
             />
-          </div>
-        </>
+          </Card>
+        ))
+      )}
+      {!isLoading && (
+        <div style={{ display: "flex", justifyContent: "end" }}>
+          <Pagination
+            total={total}
+            showSizeChanger
+            onChange={onPageChange}
+            current={currentPage}
+            onShowSizeChange={onShowSizeChange}
+          />
+        </div>
       )}
     </>
   );
