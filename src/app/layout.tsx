@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Providers from "./providers";
+import NewLayout from "@/component/Layout";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,9 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark text-foreground bg-background">
+    <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <AntdRegistry>
+          <NewLayout>{children}</NewLayout>
+        </AntdRegistry>
       </body>
     </html>
   );
