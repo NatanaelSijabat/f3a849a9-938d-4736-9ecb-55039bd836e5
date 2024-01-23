@@ -3,10 +3,15 @@ export interface PostI {
     title: string,
     body: string,
     userId: number,
-    tags:string[]
+    tags: string[]
     reactions: number
 }
 
 export interface CardPostI {
-    data:PostI[]
+    data: PostI[],
+    isLoading: boolean
+    total: number
+    setSkip: (val: number) => void
+    setLimit: (val: number) => void
+    limit: number
 }
