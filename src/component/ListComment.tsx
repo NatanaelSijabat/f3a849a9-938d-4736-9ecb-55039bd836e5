@@ -18,6 +18,10 @@ const data = [
 
 const ListComment: React.FC = () => (
   <List
+    style={{
+      width: "100%",
+      margin: "0 10px 0 40px",
+    }}
     itemLayout="horizontal"
     dataSource={data}
     renderItem={(item, index) => (

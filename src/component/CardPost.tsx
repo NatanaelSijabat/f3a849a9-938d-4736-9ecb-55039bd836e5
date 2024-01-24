@@ -51,12 +51,14 @@ const CardPost: React.FC<CardPostI> = ({
     icon,
     count,
     onClick,
+    postId,
   }: {
     icon: React.FC;
     count: number;
-    onClick: () => void;
+    onClick: (value: number) => void;
+    postId: number;
   }) => (
-    <Space onClick={onClick}>
+    <Space onClick={() => onClick(postId)}>
       {React.createElement(icon)}
       {count}
     </Space>
@@ -89,11 +91,17 @@ const CardPost: React.FC<CardPostI> = ({
                   icon={HeartOutlined}
                   count={item.reactions}
                   onClick={() => console.log("like")}
+                  postId={item.id}
                 />,
                 <IconText
                   icon={CommentOutlined}
                   count={10}
-                  onClick={() => setVisibleCommentId(item.id)}
+                  onClick={() => {
+                    setVisibleCommentId((prevId) =>
+                      prevId === item.id ? null : item.id
+                    );
+                  }}
+                  postId={item.id}
                 />,
               ]}
             >
