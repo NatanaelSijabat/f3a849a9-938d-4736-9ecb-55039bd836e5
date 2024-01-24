@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CardPostI } from "@/types/post-type";
 import {
   Avatar,
   Card,
+  Collapse,
   Pagination,
   PaginationProps,
   Skeleton,
@@ -14,6 +15,10 @@ import { CommentOutlined, HeartOutlined } from "@ant-design/icons";
 import Search, { SearchProps } from "antd/es/input/Search";
 import { useUserService } from "@/service/users-service";
 import ListComment from "./ListComment";
+import {
+  useAllCommentService,
+  useCommentByPostIdService,
+} from "@/service/comment-service";
 
 const CardPost: React.FC<CardPostI> = ({
   data,
@@ -26,8 +31,11 @@ const CardPost: React.FC<CardPostI> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { Text } = Typography;
   const { users } = useUserService();
-  // const [visible, setVisible] = useState<boolean>(false);
+  const { comments, getCommentByPostId } = useCommentByPostIdService();
+  const { comments: commentAll } = useAllCommentService();
   const [visibleCommentId, setVisibleCommentId] = useState<number | null>(null);
+
+  const { Panel } = Collapse;
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -47,6 +55,35 @@ const CardPost: React.FC<CardPostI> = ({
     setSearch(value);
   };
 
+  const [commentCounts, setCommentCounts] = useState<{
+    [postId: number]: number;
+  }>({});
+
+  const fetchComments = () => {
+    const counts: { [postId: number]: number } = {};
+    const postIdArray: number[] = [];
+
+    commentAll.forEach((comment) => {
+      const postId = comment.postId;
+      counts[postId] = (counts[postId] || 0) + 1;
+
+      postIdArray.push(postId);
+    });
+
+    //todo perbaiki length
+    for (let i = 1; i <= 150; i++) {
+      if (!postIdArray.includes(i)) {
+        counts[i] = counts[i] || 0;
+      }
+    }
+
+    setCommentCounts(counts);
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [commentAll]);
+
   const IconText = ({
     icon,
     count,
@@ -54,7 +91,7 @@ const CardPost: React.FC<CardPostI> = ({
     postId,
   }: {
     icon: React.FC;
-    count: number;
+    count: React.ReactNode;
     onClick: (value: number) => void;
     postId: number;
   }) => (
@@ -80,49 +117,66 @@ const CardPost: React.FC<CardPostI> = ({
       {isLoading ? (
         <Skeleton loading={isLoading} avatar active />
       ) : (
-        data?.map((item, index) => (
-          <>
-            <Card
-              className="m-10"
-              style={{ margin: 20 }}
+        <Collapse
+          accordion
+          style={{
+            margin: "10px",
+          }}
+        >
+          {data?.map((item, index) => (
+            <Panel
+              showArrow={false}
               key={index}
-              actions={[
-                <IconText
-                  icon={HeartOutlined}
-                  count={item.reactions}
-                  onClick={() => console.log("like")}
-                  postId={item.id}
-                />,
-                <IconText
-                  icon={CommentOutlined}
-                  count={10}
-                  onClick={() => {
-                    setVisibleCommentId((prevId) =>
-                      prevId === item.id ? null : item.id
-                    );
-                  }}
-                  postId={item.id}
-                />,
-              ]}
-            >
-              <Card.Meta
-                avatar={
-                  <Avatar
-                    src={users.find((items) => items.id === item.userId)?.image}
+              header={
+                <Card
+                  style={{ margin: 20 }}
+                  actions={[
+                    <IconText
+                      icon={HeartOutlined}
+                      count={item.reactions}
+                      onClick={() => console.log("like")}
+                      postId={item.id}
+                    />,
+                    <IconText
+                      icon={CommentOutlined}
+                      onClick={() => {
+                        setVisibleCommentId(
+                          visibleCommentId === item.id ? null : item.id
+                        );
+                        getCommentByPostId(item.id);
+                      }}
+                      postId={item.id}
+                      count={commentCounts[item.id]}
+                    />,
+                  ]}
+                >
+                  <Card.Meta
+                    avatar={
+                      <Avatar
+                        src={
+                          users.find((items) => items.id === item.userId)?.image
+                        }
+                      />
+                    }
+                    title={item.title}
+                    description={
+                      <Space direction="vertical">
+                        <Text>{item.body}</Text>
+                        <Text>
+                          {item.tags.map((tag) => `#${tag}`).join(" ")}
+                        </Text>
+                      </Space>
+                    }
                   />
-                }
-                title={item.title}
-                description={
-                  <Space direction="vertical">
-                    <Text>{item.body}</Text>
-                    <Text>{item.tags.map((tag) => `#${tag}`).join(" ")}</Text>
-                  </Space>
-                }
-              />
-            </Card>
-            {visibleCommentId === item.id && <ListComment key={index} />}
-          </>
-        ))
+                </Card>
+              }
+            >
+              {visibleCommentId === item.id && (
+                <ListComment listKey={item.id} data={comments} />
+              )}
+            </Panel>
+          ))}
+        </Collapse>
       )}
       {!isLoading && (
         <div style={{ display: "flex", justifyContent: "end" }}>

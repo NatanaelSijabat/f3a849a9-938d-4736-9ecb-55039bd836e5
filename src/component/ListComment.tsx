@@ -1,43 +1,50 @@
 import React from "react";
-import { Avatar, List } from "antd";
+import { Avatar, Button, CollapsePanelProps, Input, List, Space } from "antd";
+import { CommentI } from "@/types/commeny-type";
+import { useUserService } from "@/service/users-service";
 
-const data = [
-  {
-    title: "Ant Design Title 1",
-  },
-  {
-    title: "Ant Design Title 2",
-  },
-  {
-    title: "Ant Design Title 3",
-  },
-  {
-    title: "Ant Design Title 4",
-  },
-];
+interface ListCommentI {
+  data: CommentI[];
+  listKey: number;
+}
 
-const ListComment: React.FC = () => (
-  <List
-    style={{
-      width: "100%",
-      margin: "0 10px 0 40px",
-    }}
-    itemLayout="horizontal"
-    dataSource={data}
-    renderItem={(item, index) => (
-      <List.Item>
-        <List.Item.Meta
-          avatar={
-            <Avatar
-              src={`https://api.dicebear.com/7.x/miniavs/svg?seed=${index}`}
+const ListComment: React.FC<ListCommentI> = ({ data, listKey }) => {
+  const { users } = useUserService();
+
+  return (
+    <div>
+      <List
+        style={{
+          width: "100%",
+          margin: "10px 10px 20px 40px",
+        }}
+        itemLayout="horizontal"
+        dataSource={data}
+        key={listKey}
+        renderItem={(item, index) => (
+          <List.Item key={index}>
+            <List.Item.Meta
+              avatar={
+                <Avatar
+                  src={users.find((items) => items.id === item.user?.id)?.image}
+                />
+              }
+              title={item.user?.username}
+              description={item.body}
             />
-          }
-          title={<a href="https://ant.design">{item.title}</a>}
-          description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-        />
-      </List.Item>
-    )}
-  />
-);
+          </List.Item>
+        )}
+      />
+      <Space.Compact
+        style={{
+          width: "100%",
+        }}
+      >
+        <Input placeholder="Add Comment ..." />
+        <Button type="primary">Submit</Button>
+      </Space.Compact>
+    </div>
+  );
+};
 
 export default ListComment;

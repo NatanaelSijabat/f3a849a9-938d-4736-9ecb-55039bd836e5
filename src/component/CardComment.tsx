@@ -11,7 +11,6 @@ import {
 } from "antd";
 import { useUserService } from "@/service/users-service";
 import { CardCommentI } from "@/types/commeny-type";
-import { usePostService } from "@/service/post-service";
 
 const CardComment: React.FC<CardCommentI> = ({
   data,
@@ -33,7 +32,6 @@ const CardComment: React.FC<CardCommentI> = ({
   };
 
   const onPageChange: PaginationProps["onChange"] = (page, pageSize) => {
-    console.log(page, pageSize);
     setCurrentPage(page);
     setSkip && setSkip((page - 1) * 10);
     setLimit && setLimit(pageSize);
