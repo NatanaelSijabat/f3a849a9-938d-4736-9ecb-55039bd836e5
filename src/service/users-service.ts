@@ -1,6 +1,6 @@
-import UserSchema from "@/models/User"
-import { UserI } from "@/types/user-type"
-import { user } from "@/utils/axios"
+import { UserSchema, UsersSchema } from "@/models/User"
+import { AuthI, UserI } from "@/types/user-type"
+import { auth, user } from "@/utils/axios"
 import { useEffect, useState } from "react"
 
 const useUserService = () => {
@@ -11,7 +11,7 @@ const useUserService = () => {
             try {
                 const res = await user.get('?limit=100');
                 if (res.status === 200) {
-                    const user = UserSchema.parse(res.data.users);
+                    const user = UsersSchema.parse(res.data.users);
                     setUsers(user);
                 }
             } catch (error) {
@@ -25,4 +25,33 @@ const useUserService = () => {
     return { users }
 }
 
-export { useUserService }
+const useAuthService = () => {
+    const [user, setUser] = useState<UserI>()
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [msg, setMsg] = useState<string | null>(null);
+
+    const doLogin = async (payload: AuthI) => {
+        setIsLoading(true)
+        await auth.post('', payload, {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }).then((res) => {
+            if (res.status === 200) {
+                const userPass = UserSchema.parse(res.data);
+                setUser(userPass);
+                setMsg(null)
+            }
+        }).catch((error) => {
+            if (error.response?.status === 400) {
+                setMsg(error.response?.data?.message);
+            }
+        }).finally(()=>{
+            setIsLoading(false)
+        });
+    };
+
+    return { user, isLoading, doLogin, msg }
+}
+
+export { useUserService, useAuthService }
