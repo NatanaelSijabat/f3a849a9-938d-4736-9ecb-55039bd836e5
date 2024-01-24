@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import type { MenuProps } from "antd";
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, Typography, theme } from "antd";
 import Link from "next/link";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -51,6 +51,9 @@ const NewLayout: React.FC<NewLayoutProps> = ({ children }) => {
         />
       </Sider>
       <Layout style={{ marginLeft: 200 }}>
+        <Header style={{ backgroundColor: "white" }}>
+          <Typography>Header</Typography>
+        </Header>
         <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
           <div
             style={{

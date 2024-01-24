@@ -64,3 +64,8 @@ export interface UserI {
         network: string
     }
 }
+
+export interface AuthI {
+    username: string
+    password: string
+}

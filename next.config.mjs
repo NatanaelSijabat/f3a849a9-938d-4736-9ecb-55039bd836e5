@@ -2,7 +2,8 @@
 const nextConfig = {
     reactStrictMode: true,
     env: {
-        API: "https://dummyjson.com"
+        API: "https://dummyjson.com",
+        NEXTAUTH_SECRET: "12345"
     }
 };
 
