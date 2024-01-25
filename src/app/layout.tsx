@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import NewLayout from "@/component/Layout";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import AuthProviders from "./provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AntdRegistry>{children}</AntdRegistry>
+        <AntdRegistry>
+          <AuthProviders>{children}</AuthProviders>
+        </AntdRegistry>
       </body>
     </html>
   );

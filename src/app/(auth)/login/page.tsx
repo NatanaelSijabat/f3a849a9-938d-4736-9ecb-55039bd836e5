@@ -1,9 +1,10 @@
 "use client";
 import React from "react";
-import { Button, Card, Form, Input, Spin, message } from "antd";
-import { AuthI, UserI } from "@/types/user-type";
+import { Button, Card, Form, Input, message } from "antd";
+import { AuthI } from "@/types/user-type";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { useAuthService } from "@/service/users-service";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const SignInForm: React.FC<{
   onFinish: (values: AuthI) => Promise<void>;
@@ -48,35 +49,39 @@ const SignInForm: React.FC<{
 };
 
 const SignIn: React.FC = () => {
-  const { user, doLogin, isLoading, msg } = useAuthService();
-
+  const { push } = useRouter();
   const onFinish = async (values: AuthI) => {
     try {
-      const payload = {
+      const res = await signIn("credentials", {
         username: values.username,
         password: values.password,
-      };
-      // await doLogin(payload);
+        redirect: false,
+        // callbackUrl: "/post",
+      });
+      if (res?.ok === false) {
+        message.error(res.error);
+      } else {
+        push("/post");
+      }
+      console.log(res, "res");
     } catch (error: any) {
       console.log(error, "error");
     }
   };
-  const errorMessage = msg && <div key={msg}>{message.error(msg)}</div>;
+
+  const session: any = useSession();
+  console.log({ session });
+
   return (
     <>
       <div className="flex justify-center items-center h-screen">
-        {isLoading ? (
-          <Spin />
-        ) : (
-          <Card
-            title="Sign In"
-            bordered={false}
-            style={{ width: 400, boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}
-          >
-            {errorMessage}
-            <SignInForm onFinish={onFinish} />
-          </Card>
-        )}
+        <Card
+          title="Sign In"
+          bordered={false}
+          style={{ width: 400, boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}
+        >
+          <SignInForm onFinish={onFinish} />
+        </Card>
       </div>
     </>
   );
