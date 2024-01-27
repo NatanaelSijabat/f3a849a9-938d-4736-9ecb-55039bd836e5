@@ -31,11 +31,17 @@ const CardPost: React.FC<CardPostI> = ({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { Text } = Typography;
   const { users } = useUserService();
-  const { comments, getCommentByPostId } = useCommentByPostIdService();
+  const {
+    comments,
+    getCommentByPostId,
+    isLoading: loadingComment,
+  } = useCommentByPostIdService();
   const { comments: commentAll } = useAllCommentService();
   const [visibleCommentId, setVisibleCommentId] = useState<number | null>(null);
 
   const { Panel } = Collapse;
+
+  console.log(loadingComment, "load");
 
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
@@ -172,7 +178,11 @@ const CardPost: React.FC<CardPostI> = ({
               }
             >
               {visibleCommentId === item.id && (
-                <ListComment listKey={item.id} data={comments} />
+                <ListComment
+                  listKey={item.id}
+                  data={comments}
+                  isLoading={loadingComment}
+                />
               )}
             </Panel>
           ))}

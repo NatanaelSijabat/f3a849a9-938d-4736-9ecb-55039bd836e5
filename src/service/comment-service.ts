@@ -95,9 +95,9 @@ const useCommentByPostIdService = () => {
                 const comment = CommentSchema.parse(res.data.comments);
                 setComments(comment);
                 setTotal(res.data.total)
+                setIsLoading(false)
                 return res.data.total
             }
-            setIsLoading(false)
         } catch (error) {
             setIsLoading(false)
             return Promise.reject(error);

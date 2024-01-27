@@ -6,14 +6,16 @@ import { useUserService } from "@/service/users-service";
 interface ListCommentI {
   data: CommentI[];
   listKey: number;
+  isLoading: boolean;
 }
 
-const ListComment: React.FC<ListCommentI> = ({ data, listKey }) => {
+const ListComment: React.FC<ListCommentI> = ({ data, listKey, isLoading }) => {
   const { users } = useUserService();
 
   return (
     <div>
       <List
+        loading={isLoading}
         style={{
           width: "100%",
           margin: "10px 10px 20px 40px",
