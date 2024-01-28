@@ -1,4 +1,4 @@
-import { CommentI } from "@/types/commeny-type";
+import { AddCommentI, CommentI } from "@/types/commeny-type";
 import { ZodType, z } from "zod";
 
 const CommentSchema: ZodType<CommentI[]> = z.array(z.object({
@@ -11,4 +11,10 @@ const CommentSchema: ZodType<CommentI[]> = z.array(z.object({
     })
 }))
 
-export default CommentSchema
+const AddCommentSchema: ZodType<AddCommentI> = z.object({
+    body: z.string(),
+    postId: z.number(),
+    userId: z.number(),
+})
+
+export { CommentSchema, AddCommentSchema }

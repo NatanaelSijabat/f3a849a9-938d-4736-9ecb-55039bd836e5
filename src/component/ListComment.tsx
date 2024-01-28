@@ -1,7 +1,19 @@
 import React from "react";
-import { Avatar, Button, CollapsePanelProps, Input, List, Space } from "antd";
-import { CommentI } from "@/types/commeny-type";
+import {
+  Avatar,
+  Button,
+  CollapsePanelProps,
+  Form,
+  Input,
+  List,
+  Space,
+  message,
+} from "antd";
+import { AddCommentI, CommentI } from "@/types/commeny-type";
 import { useUserService } from "@/service/users-service";
+import { useSession } from "next-auth/react";
+import axios from "axios";
+import { AddCommentSchema } from "@/models/Comment";
 
 interface ListCommentI {
   data: CommentI[];
@@ -9,8 +21,80 @@ interface ListCommentI {
   isLoading: boolean;
 }
 
+const AddCommentForm: React.FC<{
+  onFinish: (values: AddCommentI) => Promise<void>;
+  // userId: number;
+  // postId: number;
+  form: any;
+}> = ({ onFinish, form }) => {
+  return (
+    <div>
+      <Form
+        name="basic"
+        onFinish={onFinish}
+        autoComplete="off"
+        onSubmitCapture={(e) => e.preventDefault()}
+        style={{ width: "100%", display: "flex" }}
+        form={form}
+      >
+        <Form.Item<AddCommentI>
+          name="body"
+          rules={[
+            {
+              required: true,
+              message: "Please add comment",
+            },
+          ]}
+          style={{ flex: 1, marginRight: "8px" }}
+        >
+          <Input placeholder="Add Comment ..." />
+        </Form.Item>
+        {/* <Form.Item<AddCommentI> name="postId">
+          <Input defaultValue={userId} value={userId} />
+        </Form.Item>
+        <Form.Item<AddCommentI> name="userId">
+          <Input defaultValue={postId} value={postId} />
+        </Form.Item> */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
+  );
+};
+
 const ListComment: React.FC<ListCommentI> = ({ data, listKey, isLoading }) => {
   const { users } = useUserService();
+
+  const session: any = useSession();
+  const [form] = Form.useForm();
+
+  const handleAddComment = async (e: any) => {
+    await form.validateFields().then(() => {
+      if (session?.status !== "authenticated") {
+        message.warning("please login to add comment");
+      } else {
+        const payload = {
+          body: e?.body,
+          postId: listKey,
+          userId: session?.data?.user?.id,
+        };
+        const payloadSchema = AddCommentSchema.parse(payload);
+        axios
+          .post(`https://dummyjson.com/comments/add`, payloadSchema, {
+            headers: { "Content-Type": "application/json" },
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              message.success("Sukses add Comment");
+            }
+          })
+          .finally(() => form.resetFields());
+      }
+    });
+  };
 
   return (
     <div>
@@ -37,14 +121,12 @@ const ListComment: React.FC<ListCommentI> = ({ data, listKey, isLoading }) => {
           </List.Item>
         )}
       />
-      <Space.Compact
-        style={{
-          width: "100%",
-        }}
-      >
-        <Input placeholder="Add Comment ..." />
-        <Button type="primary">Submit</Button>
-      </Space.Compact>
+      <AddCommentForm
+        onFinish={handleAddComment}
+        // userId={session?.data?.user?.id}
+        // postId={listKey}
+        form={form}
+      />
     </div>
   );
 };

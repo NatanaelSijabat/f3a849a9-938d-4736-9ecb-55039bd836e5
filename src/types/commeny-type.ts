@@ -15,3 +15,9 @@ export interface CardCommentI {
     setSkip: (val: number) => void
     setLimit: (val: number) => void
 }
+
+export interface AddCommentI {
+    body: string,
+    postId: number,
+    userId: number,
+}

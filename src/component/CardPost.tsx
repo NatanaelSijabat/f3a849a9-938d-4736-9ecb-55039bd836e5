@@ -41,8 +41,6 @@ const CardPost: React.FC<CardPostI> = ({
 
   const { Panel } = Collapse;
 
-  console.log(loadingComment, "load");
-
   const onShowSizeChange: PaginationProps["onShowSizeChange"] = (
     current,
     pageSize

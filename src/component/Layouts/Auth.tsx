@@ -40,8 +40,6 @@ const NewLayout = ({ children }: PropsWithChildren) => {
   const session = useSession();
   const router = useRouter();
 
-  console.log(session, "session");
-
   const customsItems: MenuProps["items"] = [
     {
       key: "0",

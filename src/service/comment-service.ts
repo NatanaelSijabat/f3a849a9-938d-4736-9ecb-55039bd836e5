@@ -1,7 +1,7 @@
 import { comment } from "@/utils/axios"
 import { useEffect, useState } from "react"
 import { ApiParams } from "./post-service"
-import CommentSchema from "@/models/Comment"
+import { CommentSchema } from "@/models/Comment"
 import { CommentI } from "@/types/commeny-type"
 
 const useCommentService = () => {

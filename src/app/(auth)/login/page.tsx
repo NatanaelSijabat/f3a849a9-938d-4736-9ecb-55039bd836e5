@@ -69,9 +69,6 @@ const SignIn: React.FC = () => {
     }
   };
 
-  const session: any = useSession();
-  console.log({ session });
-
   return (
     <>
       <div className="flex justify-center items-center h-screen">
