@@ -25,6 +25,7 @@ const SignInForm: React.FC<{
         <Input
           prefix={<UserOutlined className="site-form-item-icon" />}
           placeholder="Username"
+          name="username"
         />
       </Form.Item>
 
@@ -36,6 +37,7 @@ const SignInForm: React.FC<{
           prefix={<LockOutlined className="site-form-item-icon" />}
           type="password"
           placeholder="Password"
+          name="password"
         />
       </Form.Item>
 
